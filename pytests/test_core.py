@@ -15,6 +15,7 @@ from pru.core import (
 )
 
 
+# TODO: revert file back after success test
 @pytest.fixture
 def requirements_dir():
     return "pytests/requirements"
