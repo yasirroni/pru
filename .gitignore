@@ -1,0 +1,5 @@
+# environment
+env/
+
+# mac
+.DS_Store

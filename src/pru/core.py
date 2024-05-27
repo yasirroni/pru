@@ -1,0 +1,138 @@
+import re
+from subprocess import PIPE, STDOUT, Popen
+
+import pkg_resources
+
+
+def read_requirements(requirements_path):
+    with open(requirements_path, "r") as f:
+        requirements = f.readlines()
+
+    # TODO: this part should be able to be simplified
+    if "\x00" in requirements[0]:
+        with open(requirements_path, "r", encoding="utf-16") as f:
+            requirements = f.readlines()
+    return requirements
+
+
+def get_installed_packages_name():
+    installed_packages = []
+    for package in pkg_resources.working_set:
+        installed_packages.append(package.key)
+    return installed_packages
+
+
+def get_package_version(package_name):
+    try:
+        return pkg_resources.get_distribution(package_name).version
+    except pkg_resources.DistributionNotFound:
+        return None
+
+
+def get_installed_packages_name_and_version():
+    packages = {}
+    for package_name in get_installed_packages_name():
+        packages[package_name] = get_package_version(package_name)
+    return packages
+
+
+def get_requirements_packages_name(requirements_path):
+    requirements = read_requirements(requirements_path)
+
+    package_names = []
+    for requirement in requirements:
+        match = re.search(r"^([\w.-]+)", requirement, re.IGNORECASE)
+        if match:
+            package_names.append(match.group(1))
+
+    return package_names
+
+
+def get_installed_requirements_packages_and_version(requirements_path):
+    packages = {}
+    for package_name in get_requirements_packages_name(requirements_path):
+        packages[package_name] = get_package_version(package_name)
+    return packages
+
+
+def replace_requirements_packages_versions(requirements_path):
+    requirements = read_requirements(requirements_path)
+
+    installed_packages_name = get_installed_packages_name()
+
+    updated_requirements = []
+    for requirement in requirements:
+        match = re.search(r"^([\w.-]+)([>=<]+)?([\w.-]+)?(.*)$", requirement, re.DOTALL)
+        if match:
+            package_name = match.group(1)
+            if package_name in installed_packages_name:
+                # package installed and updated
+                updated_requirements.append(
+                    f"{package_name}=={get_package_version(package_name)}{match.group(4)}"
+                )
+            else:
+                updated_requirements.append(requirement)
+        else:
+            # not a package, comments or whitespaces
+            updated_requirements.append(requirement)
+
+    with open(requirements_path, "w") as f:
+        f.writelines(updated_requirements)
+
+
+def verbose_subprocess(command):
+    with Popen(
+        command, stdout=PIPE, shell=True, stderr=STDOUT, bufsize=0, close_fds=True
+    ) as process:
+        for line in iter(process.stdout.readline, b""):
+            print(line.rstrip().decode("utf-8"))
+
+
+def upgrade_installed(requirements_path, command="pip install --upgrade --user"):
+    verbose_subprocess(
+        f"{command} {' '.join(get_requirements_packages_name(requirements_path))}"
+    )
+
+
+def upgrade_requirements(requirements_path, command="pip install --upgrade --user"):
+    # read requirements.txt file
+    requirements = read_requirements(requirements_path)
+
+    # list packages on requirements.txt file
+    # NOTE: this piece of code ar copy-paste from get_requirements_packages_name
+    package_names = []
+    for requirement in requirements:
+        match = re.search(
+            r"^([\w.-]+)", requirement, re.IGNORECASE
+        )  # get file name (1) only
+        if match:
+            package_names.append(match.group(1))
+
+    # install list of packages
+    verbose_subprocess(f"{command} {' '.join(package_names)}")
+
+    # update requirements.txt
+    # NOTE: this piece of code ar copy-paste from replace_requirements_packages_versions
+    installed_packages_name = get_installed_packages_name()
+    updated_requirements = []
+    for requirement in requirements:
+        match = re.search(
+            r"^([\w.-]+)([>=<]+)?([\w.-]+)?(.*)$",  # get file name (1) and comments (4)
+            requirement,
+            re.DOTALL,
+        )
+        if match:
+            package_name = match.group(1)
+            if package_name in installed_packages_name:
+                # package installed and updated
+                updated_requirements.append(
+                    f"{package_name}=={get_package_version(package_name)}{match.group(4)}"
+                )
+            else:
+                updated_requirements.append(requirement)
+        else:
+            # not a package, comments or whitespaces
+            updated_requirements.append(requirement)
+
+    with open(requirements_path, "w") as f:
+        f.writelines(updated_requirements)
