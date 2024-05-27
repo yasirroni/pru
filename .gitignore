@@ -1,3 +1,10 @@
+# byte-compiled
+__pycache__/
+
+# build
+build/
+*.egg-info
+
 # environment
 env/
 
