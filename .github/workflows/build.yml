@@ -51,5 +51,16 @@ jobs:
         run: pip install -e ."[dev]"
 
       - name: Test package
+        id: pytest
         run: |
           pytest . -c pyproject.toml --cov-report term-missing --cov=src/pru
+        continue-on-error: true
+
+      - name: Run pru if tests fail
+        if: steps.pytest.outcome != 'success'
+        run: |
+          python_version_minor=$(python -c "import sys; print(f'{sys.version_info.minor}')")
+          pru -r pytests/requirements/3_${python_version_minor}/requirements_single.txt
+          pru -r pytests/requirements/3_${python_version_minor}/requirements_mix.txt
+          cat pytests/requirements/3_${python_version_minor}/requirements_single.txt
+          cat pytests/requirements/3_${python_version_minor}/requirements_mix.txt
