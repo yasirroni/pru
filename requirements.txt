@@ -1,6 +1,6 @@
-requests==2.25.1
-numpy>=1.19.2
-pandas<=1.2.4
+requests>=2.32.1
+numpy<=1.26.3
+pandas==2.2.1
 scipy
 
 pre-commit

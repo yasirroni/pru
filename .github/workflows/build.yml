@@ -62,5 +62,11 @@ jobs:
           python_version_minor=$(python -c "import sys; print(f'{sys.version_info.minor}')")
           pru -r pytests/requirements/3_${python_version_minor}/requirements_single.txt
           pru -r pytests/requirements/3_${python_version_minor}/requirements_mix.txt
+          echo "Contents of pytests/requirements/3_${python_version_minor}/requirements_single.txt:"
           cat pytests/requirements/3_${python_version_minor}/requirements_single.txt
+          echo "Contents of pytests/requirements/3_${python_version_minor}/requirements_mix.txt:"
           cat pytests/requirements/3_${python_version_minor}/requirements_mix.txt
+
+      - name: Fail the job if tests fail
+        if: steps.pytest.outcome != 'success'
+        run: exit 1
