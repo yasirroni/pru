@@ -3,8 +3,13 @@
 ## Environment
 
 ```shell
-python3.12 -m venv env
-source env/bin/activate
+python3.12 -m venv env3_12
+source env3_12/bin/activate
+```
+
+```shell
+python3.7 -m venv env3_7
+source env3_7/bin/activate
 ```
 
 ## Install requirements

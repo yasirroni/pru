@@ -10,6 +10,12 @@ pip install pru
 
 ## Usage
 
+Using CLI:
+
+```shell
+pru "requirements.txt" upgrade_packages --cmd "pip install --upgrade"
+```
+
 Using python:
 
 ```python
