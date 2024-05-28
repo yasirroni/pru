@@ -36,5 +36,5 @@ upgrade_requirements(file_path, command='pip install --upgrade')
 
 ## Known Issue
 
-In python3.7, pru can't install and update requirements using a single call of 
-`upgrade_requirements`.
+In python3.7, pru "sometimes" can't install and update requirements using a single call
+of `upgrade_requirements`. To fix this, simply run two times.
