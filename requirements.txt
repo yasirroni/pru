@@ -6,3 +6,4 @@ scipy
 pre-commit
 pytest
 pytest-cov
+pytest-dependency

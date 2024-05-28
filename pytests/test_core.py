@@ -14,6 +14,7 @@ from pru.core import (
     upgrade_requirements,
     verbose_subprocess,
 )
+from pytest_dependency import depends
 
 
 # TODO: revert file back after success test
@@ -74,30 +75,6 @@ def test_get_installed_requirements_packages_and_version(
         assert package in result
 
 
-@pytest.mark.parametrize(
-    "file_name, expected_file",
-    [
-        ("requirements_single.txt", "requirements_single_updated.txt"),
-        ("requirements_mix.txt", "requirements_mix_updated.txt"),
-    ],
-)
-def test_replace_requirements_packages_versions(
-    requirements_dir, file_name, expected_file
-):
-    requirements_path = os.path.join(requirements_dir, file_name)
-    expected_path = os.path.join(requirements_dir, expected_file)
-
-    with open(expected_path, "r") as f:
-        expected = f.readlines()
-
-    replace_requirements_packages_versions(requirements_path)
-
-    with open(requirements_path, "r") as f:
-        result = f.readlines()
-
-    assert result == expected
-
-
 def test_verbose_subprocess():
     command = "echo test"
     verbose_subprocess(command)  # This should print "test" to stdout
@@ -108,6 +85,36 @@ def test_upgrade_installed(requirements_dir):
     upgrade_installed(requirements_path, command="pip install --upgrade")
 
 
+@pytest.mark.dependency()
+@pytest.mark.parametrize(
+    "file_name, expected_file",
+    [
+        ("requirements_single.txt", "requirements_single_updated.txt"),
+        ("requirements_mix.txt", "requirements_mix_updated.txt"),
+    ],
+    ids=["requirements_single.txt", "requirements_mix.txt"],
+)
+def test_upgrade_requirements(requirements_dir, file_name, expected_file):
+    requirements_path = os.path.join(requirements_dir, file_name)
+    expected_path = os.path.join(requirements_dir, expected_file)
+
+    with open(requirements_path, "r") as f:
+        initial = f.readlines()
+
+    with open(expected_path, "r") as f:
+        expected = f.readlines()
+
+    upgrade_requirements(requirements_path, command="pip install --upgrade")
+
+    with open(requirements_path, "r+") as f:
+        result = f.readlines()
+        f.seek(0)
+        f.writelines(initial)
+        f.truncate()
+
+    assert result == expected
+
+
 @pytest.mark.parametrize(
     "file_name, expected_file",
     [
@@ -115,16 +122,25 @@ def test_upgrade_installed(requirements_dir):
         ("requirements_mix.txt", "requirements_mix_updated.txt"),
     ],
 )
-def test_upgrade_requirements(requirements_dir, file_name, expected_file):
+def test_replace_requirements_packages_versions(
+    requirements_dir, file_name, expected_file, request
+):
+    depends(request, [f"test_upgrade_requirements[{file_name}]"])
     requirements_path = os.path.join(requirements_dir, file_name)
     expected_path = os.path.join(requirements_dir, expected_file)
+
+    with open(requirements_path, "r") as f:
+        initial = f.readlines()
 
     with open(expected_path, "r") as f:
         expected = f.readlines()
 
-    upgrade_requirements(requirements_path, command="pip install --upgrade")
+    replace_requirements_packages_versions(requirements_path)
 
-    with open(requirements_path, "r") as f:
+    with open(requirements_path, "r+") as f:
         result = f.readlines()
+        f.seek(0)
+        f.writelines(initial)
+        f.truncate()
 
     assert result == expected
