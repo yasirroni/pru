@@ -64,7 +64,7 @@ jobs:
         continue-on-error: true
 
       - name: Run pru if tests fail
-        if: steps.pytest2.outcome != 'success'
+        if: steps.pytest.outcome != 'success' || steps.pytest2.outcome != 'success'
         run: |
           python_version_minor=$(python -c "import sys; print(f'{sys.version_info.minor}')")
           pru -r pytests/requirements/3_${python_version_minor}/requirements_single.txt
@@ -75,5 +75,5 @@ jobs:
           cat pytests/requirements/3_${python_version_minor}/requirements_mix.txt
 
       - name: Fail the job if tests fail
-        if: steps.pytest2.outcome != 'success'
+        if: steps.pytest.outcome != 'success' || steps.pytest2.outcome != 'success'
         run: exit 1
