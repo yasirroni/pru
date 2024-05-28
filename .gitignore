@@ -1,3 +1,8 @@
+# test
+.coverage*
+.pytest_cache
+.ruff_cache
+
 # byte-compiled
 __pycache__/
 
