@@ -20,9 +20,9 @@ pip install -r requirements.txt
 
 ## Install package in development mode
 
-<!-- 
-TODO: ...
--->
+```shell
+pip install ."[dev]"
+```
 
 ## Pre-Commit
 
