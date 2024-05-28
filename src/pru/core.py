@@ -1,6 +1,13 @@
 import re
-from importlib.metadata import PackageNotFoundError, distributions, version
+import sys
 from subprocess import PIPE, STDOUT, Popen
+
+if sys.version_info >= (3, 8):
+    IS_PYTHON_7 = False
+    from importlib.metadata import PackageNotFoundError, distributions, version
+else:
+    IS_PYTHON_7 = True
+    import pkg_resources
 
 
 def read_requirements(requirements_path):
@@ -15,17 +22,26 @@ def read_requirements(requirements_path):
 
 
 def get_installed_packages_name():
-    installed_packages = []
-    for distribution in distributions():
-        installed_packages.append(distribution.metadata["Name"])
+    if IS_PYTHON_7:
+        installed_packages = [package.key for package in pkg_resources.working_set]
+    else:
+        installed_packages = [
+            distribution.metadata["Name"] for distribution in distributions()
+        ]
     return installed_packages
 
 
 def get_package_version(package_name):
-    try:
-        return version(package_name)
-    except PackageNotFoundError:
-        return None
+    if IS_PYTHON_7:
+        try:
+            return pkg_resources.get_distribution(package_name).version
+        except pkg_resources.DistributionNotFound:
+            return None
+    else:
+        try:
+            return version(package_name)
+        except PackageNotFoundError:
+            return None
 
 
 def get_installed_packages_name_and_version():
