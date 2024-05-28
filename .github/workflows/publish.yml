@@ -34,7 +34,7 @@ jobs:
       - name: Test package
         id: pytest
         run: |
-          pytest . -c pyproject.toml
+          python3 -m pytest . -c pyproject.toml
         continue-on-error: true
 
   deploy:

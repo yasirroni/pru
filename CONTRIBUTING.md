@@ -30,3 +30,9 @@ pip install ."[dev]"
 pre-commit install
 pre-commit run --all-files
 ```
+
+## Test
+
+```shell
+python3 -m pytest . -c pyproject.toml --cov-report term-missing --cov=src/pru
+```

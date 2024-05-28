@@ -53,7 +53,7 @@ jobs:
       - name: Test package
         id: pytest
         run: |
-          pytest . -c pyproject.toml --cov-report term-missing --cov=src/pru
+          python3 -m pytest . -c pyproject.toml --cov-report term-missing --cov=src/pru
         continue-on-error: true
 
       - name: Run pru if tests fail
