@@ -17,14 +17,16 @@ from pru.core import (
 
 # TODO: revert file back after success test
 @pytest.fixture
-def requirements_dir():
-    return "pytests/requirements"
+def requirements_3_12_dir():
+    return "pytests/requirements/3_12"
 
 
-def test_read_requirements(requirements_dir):
-    requirements_path = os.path.join(
-        requirements_dir, "requirements_single_package.txt"
-    )
+def requirements_3_7_dir():
+    return "pytests/requirements/3_7"
+
+
+def test_read_requirements(requirements_3_12_dir):
+    requirements_path = os.path.join(requirements_3_12_dir, "requirements_single.txt")
     result = read_requirements(requirements_path)
     assert result == ["requests\n"]
 
@@ -48,12 +50,12 @@ def test_get_installed_packages_name_and_version():
 @pytest.mark.parametrize(
     "file_name, expected",
     [
-        ("requirements_single_package.txt", ["requests"]),
+        ("requirements_single.txt", ["requests"]),
         ("requirements_mix.txt", ["requests", "numpy", "pandas", "scipy"]),
     ],
 )
-def test_get_requirements_packages_name(requirements_dir, file_name, expected):
-    requirements_path = os.path.join(requirements_dir, file_name)
+def test_get_requirements_packages_name(requirements_3_12_dir, file_name, expected):
+    requirements_path = os.path.join(requirements_3_12_dir, file_name)
     result = get_requirements_packages_name(requirements_path)
     assert result == expected
 
@@ -61,14 +63,14 @@ def test_get_requirements_packages_name(requirements_dir, file_name, expected):
 @pytest.mark.parametrize(
     "file_name, expected",
     [
-        ("requirements_single_package.txt", {"requests": None}),
+        ("requirements_single.txt", {"requests": None}),
         ("requirements_mix.txt", {"requests": None, "numpy": None, "pandas": None}),
     ],
 )
 def test_get_installed_requirements_packages_and_version(
-    requirements_dir, file_name, expected
+    requirements_3_12_dir, file_name, expected
 ):
-    requirements_path = os.path.join(requirements_dir, file_name)
+    requirements_path = os.path.join(requirements_3_12_dir, file_name)
     result = get_installed_requirements_packages_and_version(requirements_path)
     for package in expected:
         assert package in result
@@ -77,15 +79,15 @@ def test_get_installed_requirements_packages_and_version(
 @pytest.mark.parametrize(
     "file_name, expected_file",
     [
-        ("requirements_single_package.txt", "requirements_single_package_updated.txt"),
+        ("requirements_single.txt", "requirements_single_updated.txt"),
         ("requirements_mix.txt", "requirements_mix_updated.txt"),
     ],
 )
 def test_replace_requirements_packages_versions(
-    requirements_dir, file_name, expected_file
+    requirements_3_12_dir, file_name, expected_file
 ):
-    requirements_path = os.path.join(requirements_dir, file_name)
-    expected_path = os.path.join(requirements_dir, expected_file)
+    requirements_path = os.path.join(requirements_3_12_dir, file_name)
+    expected_path = os.path.join(requirements_3_12_dir, expected_file)
 
     with open(expected_path, "r") as f:
         expected = f.readlines()
@@ -103,23 +105,21 @@ def test_verbose_subprocess():
     verbose_subprocess(command)  # This should print "test" to stdout
 
 
-def test_upgrade_installed(requirements_dir):
-    requirements_path = os.path.join(
-        requirements_dir, "requirements_single_package.txt"
-    )
+def test_upgrade_installed(requirements_3_12_dir):
+    requirements_path = os.path.join(requirements_3_12_dir, "requirements_single.txt")
     upgrade_installed(requirements_path, command="pip install --upgrade")
 
 
 @pytest.mark.parametrize(
     "file_name, expected_file",
     [
-        ("requirements_single_package.txt", "requirements_single_package_updated.txt"),
+        ("requirements_single.txt", "requirements_single_updated.txt"),
         ("requirements_mix.txt", "requirements_mix_updated.txt"),
     ],
 )
-def test_upgrade_requirements(requirements_dir, file_name, expected_file):
-    requirements_path = os.path.join(requirements_dir, file_name)
-    expected_path = os.path.join(requirements_dir, expected_file)
+def test_upgrade_requirements(requirements_3_12_dir, file_name, expected_file):
+    requirements_path = os.path.join(requirements_3_12_dir, file_name)
+    expected_path = os.path.join(requirements_3_12_dir, expected_file)
 
     with open(expected_path, "r") as f:
         expected = f.readlines()
