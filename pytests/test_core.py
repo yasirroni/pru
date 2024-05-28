@@ -106,11 +106,11 @@ def test_upgrade_requirements(requirements_dir, file_name, expected_file):
 
     upgrade_requirements(requirements_path, command="pip install --upgrade")
 
-    with open(requirements_path, "r+") as f:
+    with open(requirements_path, "r") as f:
         result = f.readlines()
-        f.seek(0)
+
+    with open(requirements_path, "w") as f:
         f.writelines(initial)
-        f.truncate()
 
     assert result == expected
 

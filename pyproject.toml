@@ -57,9 +57,3 @@ lint.select = [
     "C",  # flake8-comprehensions
     "B",  # flake8-bugbear
 ]
-lint.ignore = [
-    "B90",  # support <3.10
-    "E402",  # temporarily due to nbqa did not support [tool.ruff.per-file-ignores]
-]
-
-[tool.ruff.lint.per-file-ignores]
