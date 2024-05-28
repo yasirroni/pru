@@ -1,7 +1,6 @@
 import re
+from importlib.metadata import PackageNotFoundError, distributions, version
 from subprocess import PIPE, STDOUT, Popen
-
-import pkg_resources
 
 
 def read_requirements(requirements_path):
@@ -17,15 +16,15 @@ def read_requirements(requirements_path):
 
 def get_installed_packages_name():
     installed_packages = []
-    for package in pkg_resources.working_set:
-        installed_packages.append(package.key)
+    for distribution in distributions():
+        installed_packages.append(distribution.metadata["Name"])
     return installed_packages
 
 
 def get_package_version(package_name):
     try:
-        return pkg_resources.get_distribution(package_name).version
-    except pkg_resources.DistributionNotFound:
+        return version(package_name)
+    except PackageNotFoundError:
         return None
 
 
