@@ -56,8 +56,15 @@ jobs:
           python3 -m pytest . -c pyproject.toml --cov-report term-missing --cov=src/pru
         continue-on-error: true
 
-      - name: Run pru if tests fail
+      - name: Test package 2
+        id: pytest2
         if: steps.pytest.outcome != 'success'
+        run: |
+          python3 -m pytest . --lf -c pyproject.toml --cov-report term-missing --cov=src/pru
+        continue-on-error: true
+
+      - name: Run pru if tests fail
+        if: steps.pytest2.outcome != 'success'
         run: |
           python_version_minor=$(python -c "import sys; print(f'{sys.version_info.minor}')")
           pru -r pytests/requirements/3_${python_version_minor}/requirements_single.txt
@@ -68,5 +75,5 @@ jobs:
           cat pytests/requirements/3_${python_version_minor}/requirements_mix.txt
 
       - name: Fail the job if tests fail
-        if: steps.pytest.outcome != 'success'
+        if: steps.pytest2.outcome != 'success'
         run: exit 1

@@ -122,8 +122,6 @@ def upgrade_installed(requirements_path, command="pip install --upgrade --user")
 def upgrade_requirements(
     requirements_path, output_path=None, command="pip install --upgrade --user"
 ):
-    # print(get_installed_packages_name_and_version())
     package_names = get_requirements_packages_name(requirements_path)
     verbose_subprocess(f"{command} {' '.join(package_names)}")
-    # print(get_installed_packages_name_and_version())
     replace_requirements_packages_versions(requirements_path, output_path)
