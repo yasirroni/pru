@@ -10,7 +10,9 @@ else:
     import pkg_resources
 
 
-def read_requirements(requirements_path):
+def read_requirements(requirements_path=None):
+    if requirements_path is None:
+        requirements_path = get_requirements_path()
     with open(requirements_path, "r") as f:
         requirements = f.readlines()
 
@@ -56,7 +58,7 @@ def get_installed_packages_name_and_version():
     return packages
 
 
-def get_requirements_packages_name(requirements_path):
+def get_requirements_packages_name(requirements_path=None):
     requirements = read_requirements(requirements_path)
 
     package_names = []
@@ -67,14 +69,14 @@ def get_requirements_packages_name(requirements_path):
     return package_names
 
 
-def get_installed_requirements_packages_and_version(requirements_path):
+def get_installed_requirements_packages_and_version(requirements_path=None):
     packages = {}
     for package_name in get_requirements_packages_name(requirements_path):
         packages[package_name] = get_package_version(package_name)
     return packages
 
 
-def replace_requirements_packages_versions(requirements_path, output_path=None):
+def replace_requirements_packages_versions(requirements_path=None, output_path=None):
     requirements = read_requirements(requirements_path)
 
     installed_packages_name = get_installed_packages_name()
@@ -99,6 +101,8 @@ def replace_requirements_packages_versions(requirements_path, output_path=None):
             updated_requirements.append(requirement)
 
     if output_path is None:
+        if requirements_path is None:
+            requirements_path = get_requirements_path()
         output_path = requirements_path
 
     with open(output_path, "w") as f:
@@ -113,15 +117,21 @@ def verbose_subprocess(command):
             print(line.rstrip().decode("utf-8"))
 
 
-def upgrade_installed(requirements_path, command="pip install --upgrade --user"):
+def upgrade_installed(requirements_path=None, command="pip install --upgrade --user"):
     verbose_subprocess(
         f"{command} {' '.join(get_requirements_packages_name(requirements_path))}"
     )
 
 
 def upgrade_requirements(
-    requirements_path, output_path=None, command="pip install --upgrade --user"
+    requirements_path=None, output_path=None, command="pip install --upgrade --user"
 ):
     package_names = get_requirements_packages_name(requirements_path)
     verbose_subprocess(f"{command} {' '.join(package_names)}")
     replace_requirements_packages_versions(requirements_path, output_path)
+
+
+def get_requirements_path():
+    # TODO: support finding requirements file
+    requirements_path = "requirements.txt"
+    return requirements_path

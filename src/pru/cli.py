@@ -16,10 +16,11 @@ def main():
         "-r",
         "--requirement",
         type=str,
-        default="requirements.txt",
+        default=None,
         help=(
             "Path to the requirements file. Defaults to using requirements.txt from "
-            "the current directory if it exists."
+            "the current directory if it exists. Use '.' to indicate no requirements "
+            "file."
         ),
     )
     parser.add_argument(
@@ -27,7 +28,7 @@ def main():
         "--output",
         type=str,
         help=(
-            "Output updated packages to this file. Defaults to overwriting the input"
+            "Output updated packages to this file. Defaults to overwriting the input "
             "requirements file."
         ),
     )
