@@ -19,9 +19,22 @@ pru "requirements.txt" upgrade_requirements --cmd "pip install --upgrade"
 Using python:
 
 ```python
+from pru import (
+    get_installed_requirements_packages_and_version,
+    get_installed_packages_name_and_version,
+    replace_requirements_packages_versions,
+    upgrade_requirements,
+)
+
+
 file_path = 'requirements.txt'
 # print(get_installed_requirements_packages_and_version(file_path))
 # print(get_installed_packages_name_and_version())
 # replace_requirements_packages_versions(file_path)
 upgrade_requirements(file_path, command='pip install --upgrade')
 ```
+
+## Known Issue
+
+In python3.7, pru can't install and update requirements using a single call of 
+`upgrade_requirements`.

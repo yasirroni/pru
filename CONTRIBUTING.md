@@ -34,5 +34,12 @@ pre-commit run --all-files
 ## Test
 
 ```shell
-python3 -m pytest . -c pyproject.toml --cov-report term-missing --cov=src/pru
+python3 -m pytest . -rA -c pyproject.toml --cov-report term-missing --cov=src/pru
+```
+
+## Clean installed packages from test
+
+```shell
+pip uninstall -y requests numpy pandas scipy
+pip cache purge
 ```

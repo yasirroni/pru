@@ -22,6 +22,11 @@ def read_requirements(requirements_path):
 
 
 def get_installed_packages_name():
+    # TODO:
+    #   [BUG] in Python3.7, get_installed_packages_name() did not fetch newly installed
+    # packages installed from verbose_subprocess, but will be able to fetch it in the
+    # second run. This is not `pkg_resources` specific, but 3.7 specific.
+
     if IS_PYTHON_7:
         installed_packages = [package.key for package in pkg_resources.working_set]
     else:
@@ -117,6 +122,8 @@ def upgrade_installed(requirements_path, command="pip install --upgrade --user")
 def upgrade_requirements(
     requirements_path, output_path=None, command="pip install --upgrade --user"
 ):
+    # print(get_installed_packages_name_and_version())
     package_names = get_requirements_packages_name(requirements_path)
     verbose_subprocess(f"{command} {' '.join(package_names)}")
+    # print(get_installed_packages_name_and_version())
     replace_requirements_packages_versions(requirements_path, output_path)
