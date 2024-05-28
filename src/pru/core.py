@@ -76,6 +76,9 @@ def replace_requirements_packages_versions(requirements_path, output_path=None):
 
     updated_requirements = []
     for requirement in requirements:
+        # TODO:
+        #   support respect all symbols
+        #   support single package in multi package requirements
         match = re.search(r"^([\w.-]+)([>=<]+)?([\w.-]+)?(.*)$", requirement, re.DOTALL)
         if match:
             package_name = match.group(1)
