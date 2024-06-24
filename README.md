@@ -13,6 +13,12 @@ pip install pru
 Using CLI:
 
 ```shell
+pru
+```
+
+Explicit run using CLI:
+
+```shell
 pru "requirements.txt" upgrade_requirements --cmd "pip install --upgrade"
 ```
 
