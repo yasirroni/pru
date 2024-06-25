@@ -1,4 +1,4 @@
-name: build
+name: CI
 
 on:
   pull_request:
@@ -45,19 +45,16 @@ jobs:
       - name: Upgrade pip and install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pru
+          pip install pru -e ."[dev]"
           pru
 
-      - name: Install package
-        run: pip install -e ."[dev]"
-
-      - name: Test package
+      - name: Run tests
         id: pytest
         run: |
           python3 -m pytest . -c pyproject.toml --cov-report term-missing --cov=src/pru
         continue-on-error: true
 
-      - name: Test package 2
+      - name: Run tests with last failed
         id: pytest2
         if: steps.pytest.outcome != 'success'
         run: |
@@ -69,44 +66,12 @@ jobs:
         if: steps.pytest.outcome != 'success' && steps.pytest2.outcome != 'success'
         run: |
           python_version_minor=$(python -c "import sys; print(f'{sys.version_info.minor}')")
-          checksum_before_single=$(md5sum pytests/requirements/3_${python_version_minor}/requirements_single.txt | cut -d ' ' -f 1)
-          checksum_before_mix=$(md5sum pytests/requirements/3_${python_version_minor}/requirements_mix.txt | cut -d ' ' -f 1)
           pru -r pytests/requirements/3_${python_version_minor}/requirements_single.txt
           pru -r pytests/requirements/3_${python_version_minor}/requirements_mix.txt
-          checksum_after_single=$(md5sum pytests/requirements/3_${python_version_minor}/requirements_single.txt | cut -d ' ' -f 1)
-          checksum_after_mix=$(md5sum pytests/requirements/3_${python_version_minor}/requirements_mix.txt | cut -d ' ' -f 1)
-          updated_files=""
-          if [ "$checksum_before_single" != "$checksum_after_single" ]; then
-            updated_files="pytests/requirements/3_${python_version_minor}/requirements_single.txt"
-          fi
-          if [ "$checksum_before_mix" != "$checksum_after_mix" ]; then
-            if [ -n "$updated_files" ]; then
-              updated_files="$updated_files, "
-            fi
-            updated_files="${updated_files}pytests/requirements/3_${python_version_minor}/requirements_mix.txt"
-          fi
-          echo "::set-output name=updated::$(if [ "$updated_files" ]; then echo true; else echo false; fi)"
-          echo "::set-output name=updated_files::$updated_files"
-          echo "::set-output name=update_date::$(date -u +'%Y-%m-%d')"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Pull Request if requirements updated
-        if: steps.run_pru.outputs.updated == 'true'
-        uses: peter-evans/create-pull-request@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: |
-            Update requirements based on failed tests
-            - Updated files: ${{ steps.run_pru.outputs.updated_files }}
-            - Date: ${{ steps.run_pru.outputs.update_date }}
-          branch: update-requirements-${{ matrix.python-version }}-${{ github.run_id }}
-          title: 'Update requirements for Python ${{ matrix.python-version }} on ${{ steps.run_pru.outputs.update_date }}'
-          body: |
-            This PR updates the following requirements files based on the output of failed tests:
-            - ${{ steps.run_pru.outputs.updated_files }}
-            Date of update: ${{ steps.run_pru.outputs.update_date }}
-          labels: update, automated-pr
+          echo "Contents of pytests/requirements/3_${python_version_minor}/requirements_single.txt:"
+          cat pytests/requirements/3_${python_version_minor}/requirements_single.txt
+          echo "Contents of pytests/requirements/3_${python_version_minor}/requirements_mix.txt:"
+          cat pytests/requirements/3_${python_version_minor}/requirements_mix.txt
 
       - name: Fail the job if tests fail
         if: steps.pytest.outcome != 'success' && steps.pytest2.outcome != 'success'
