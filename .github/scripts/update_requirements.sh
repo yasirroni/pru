@@ -48,19 +48,6 @@ done
 
 if [ ${#UPDATED_FILES[@]} -ne 0 ]; then
   echo "Requirements updated. Creating pull request."
-  git config --global user.email "github-actions[bot]@users.noreply.github.com"
-  git config --global user.name "github-actions[bot]"
-  
-  BRANCH_NAME="update-requirements-${GITHUB_RUN_ID}"
-  git checkout -b $BRANCH_NAME
-  
-  git add "${UPDATED_FILES[@]}"
-  git commit -m "Update requirements based on failed tests
-- Updated files: ${UPDATED_FILES[*]}
-- Date: $DATE"
-  
-  git push origin $BRANCH_NAME
-  
   echo "::set-output name=updated::true"
   echo "::set-output name=updated_files::${UPDATED_FILES[*]}"
   echo "::set-output name=update_date::$DATE"
