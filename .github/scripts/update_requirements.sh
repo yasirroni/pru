@@ -9,21 +9,29 @@ DATE=$(date -u +'%Y-%m-%d')
 for version in "${PYTHON_VERSIONS[@]}"; do
   echo "Processing Python $version"
   
-  pyenv install -s $version
-  pyenv virtualenv -f $version venv_$version
-  pyenv activate venv_$version
+  # Create virtual environment
+  python3 -m venv env_$version
+  source env_$version/bin/activate
   
+  # Ensure pip is up-to-date
+  pip install --upgrade pip
+  
+  # Install pru
   pip install pru
   
+  # Calculate checksums before running pru
   checksum_before_single=$(md5sum pytests/requirements/${version}/requirements_single.txt | cut -d ' ' -f 1)
   checksum_before_mix=$(md5sum pytests/requirements/${version}/requirements_mix.txt | cut -d ' ' -f 1)
   
+  # Run pru to update requirements
   pru -r pytests/requirements/${version}/requirements_single.txt
   pru -r pytests/requirements/${version}/requirements_mix.txt
   
+  # Calculate checksums after running pru
   checksum_after_single=$(md5sum pytests/requirements/${version}/requirements_single.txt | cut -d ' ' -f 1)
   checksum_after_mix=$(md5sum pytests/requirements/${version}/requirements_mix.txt | cut -d ' ' -f 1)
   
+  # Check if any requirements file was updated
   if [ "$checksum_before_single" != "$checksum_after_single" ]; then
     UPDATED_FILES+=("pytests/requirements/${version}/requirements_single.txt")
   fi
@@ -31,8 +39,9 @@ for version in "${PYTHON_VERSIONS[@]}"; do
     UPDATED_FILES+=("pytests/requirements/${version}/requirements_mix.txt")
   fi
   
-  pyenv deactivate
-  pyenv uninstall -f venv_$version
+  # Deactivate and remove the virtual environment
+  deactivate
+  rm -rf env_$version
 done
 
 if [ ${#UPDATED_FILES[@]} -ne 0 ]; then
