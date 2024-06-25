@@ -64,15 +64,45 @@ jobs:
         continue-on-error: true
 
       - name: Run pru if tests fail
+        id: run_pru
         if: steps.pytest.outcome != 'success' && steps.pytest2.outcome != 'success'
         run: |
           python_version_minor=$(python -c "import sys; print(f'{sys.version_info.minor}')")
+          checksum_before_single=$(md5sum pytests/requirements/3_${python_version_minor}/requirements_single.txt | cut -d ' ' -f 1)
+          checksum_before_mix=$(md5sum pytests/requirements/3_${python_version_minor}/requirements_mix.txt | cut -d ' ' -f 1)
           pru -r pytests/requirements/3_${python_version_minor}/requirements_single.txt
           pru -r pytests/requirements/3_${python_version_minor}/requirements_mix.txt
-          echo "Contents of pytests/requirements/3_${python_version_minor}/requirements_single.txt:"
-          cat pytests/requirements/3_${python_version_minor}/requirements_single.txt
-          echo "Contents of pytests/requirements/3_${python_version_minor}/requirements_mix.txt:"
-          cat pytests/requirements/3_${python_version_minor}/requirements_mix.txt
+          checksum_after_single=$(md5sum pytests/requirements/3_${python_version_minor}/requirements_single.txt | cut -d ' ' -f 1)
+          checksum_after_mix=$(md5sum pytests/requirements/3_${python_version_minor}/requirements_mix.txt | cut -d ' ' -f 1)
+          updated_files=""
+          if [ "$checksum_before_single" != "$checksum_after_single" ]; then
+            updated_files="pytests/requirements/3_${python_version_minor}/requirements_single.txt"
+          fi
+          if [ "$checksum_before_mix" != "$checksum_after_mix" ]; then
+            if [ -n "$updated_files" ]; then
+              updated_files="$updated_files, "
+            fi
+            updated_files="${updated_files}pytests/requirements/3_${python_version_minor}/requirements_mix.txt"
+          fi
+          echo "::set-output name=updated::$(if [ "$updated_files" ]; then echo true; else echo false; fi)"
+          echo "::set-output name=updated_files::$updated_files"
+          echo "::set-output name=update_date::$(date -u +'%Y-%m-%d')"
+
+      - name: Create Pull Request if requirements updated
+        if: steps.run_pru.outputs.updated == 'true'
+        uses: peter-evans/create-pull-request@v4
+        with:
+          commit-message: |
+            Update requirements based on failed tests
+            - Updated files: ${{ steps.run_pru.outputs.updated_files }}
+            - Date: ${{ steps.run_pru.outputs.update_date }}
+          branch: update-requirements-${{ matrix.python-version }}-${{ github.run_id }}
+          title: 'Update requirements for Python ${{ matrix.python-version }} on ${{ steps.run_pru.outputs.update_date }}'
+          body: |
+            This PR updates the following requirements files based on the output of failed tests:
+            - ${{ steps.run_pru.outputs.updated_files }}
+            Date of update: ${{ steps.run_pru.outputs.update_date }}
+          labels: update, automated-pr
 
       - name: Fail the job if tests fail
         if: steps.pytest.outcome != 'success' && steps.pytest2.outcome != 'success'
