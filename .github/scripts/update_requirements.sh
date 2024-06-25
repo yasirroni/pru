@@ -16,7 +16,7 @@ install_python() {
     sudo apt install software-properties-common
     sudo add-apt-repository ppa:deadsnakes/ppa
     sudo apt-get update
-    sudo apt-get install -y python${version}
+    sudo apt-get install -y python${version} python${version}-venv
   else
     echo "Python ${version} is already installed."
   fi
@@ -31,6 +31,13 @@ for version in "${PYTHON_VERSIONS[@]}"; do
   # Create virtual environment specific to the current Python version
   python${version} -m venv "env_${version}"
   source "env_${version}/bin/activate"
+  
+  # Install pip using get-pip.py if it's not already installed
+  if ! command -v pip &> /dev/null; then
+    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+    python get-pip.py
+    rm get-pip.py
+  fi
   
   # Ensure pip is up-to-date within the virtual environment
   pip install --upgrade pip

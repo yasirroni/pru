@@ -1,4 +1,4 @@
-name: Update Requirements
+name: update
 
 on:
   pull_request:
