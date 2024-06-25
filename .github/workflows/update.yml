@@ -37,14 +37,6 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
-      - name: Create new branch
-        if: steps.run_pru.outputs.updated == 'true'
-        run: |
-          BRANCH_NAME="update-requirements-${GITHUB_RUN_ID}"
-          git checkout -b $BRANCH_NAME
-          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
-          echo "DATE=${{ steps.run_pru.outputs.update_date }}" >> $GITHUB_ENV
-
       - name: Commit changes
         if: steps.run_pru.outputs.updated == 'true'
         run: |
