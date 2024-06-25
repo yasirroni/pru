@@ -45,13 +45,6 @@ jobs:
         env:
           DATE: ${{ steps.run_pru.outputs.update_date }}
 
-      - name: Push changes
-        if: steps.run_pru.outputs.updated == 'true'
-        run: |
-          git push origin $BRANCH_NAME
-        env:
-          BRANCH_NAME: ${{ env.BRANCH_NAME }}
-
       - name: Create Pull Request
         if: steps.run_pru.outputs.updated == 'true'
         uses: peter-evans/create-pull-request@v4
