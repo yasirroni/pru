@@ -54,15 +54,15 @@ if [ ${#UPDATED_FILES[@]} -ne 0 ]; then
   BRANCH_NAME="update-requirements-${GITHUB_RUN_ID}"
   git checkout -b $BRANCH_NAME
   
-  git add ${UPDATED_FILES[@]}
+  git add "${UPDATED_FILES[@]}"
   git commit -m "Update requirements based on failed tests
-  - Updated files: ${UPDATED_FILES[@]}
-  - Date: $DATE"
+- Updated files: ${UPDATED_FILES[*]}
+- Date: $DATE"
   
   git push origin $BRANCH_NAME
   
   gh pr create --title "Update requirements for Python versions on $DATE" \
-               --body "This PR updates the following requirements files based on the output of failed tests:\n- ${UPDATED_FILES[@]}\nDate of update: $DATE" \
+               --body "This PR updates the following requirements files based on the output of failed tests:\n- ${UPDATED_FILES[*]}\nDate of update: $DATE" \
                --label "update, automated-pr"
 else
   echo "No requirements updated."
