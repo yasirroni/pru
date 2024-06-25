@@ -12,6 +12,9 @@ install_python() {
   
   if ! command -v python${version} &> /dev/null; then
     echo "Python ${version} not found. Installing..."
+    sudo apt update
+    sudo apt install software-properties-common
+    sudo add-apt-repository ppa:deadsnakes/ppa
     sudo apt-get update
     sudo apt-get install -y python${version}
   else
