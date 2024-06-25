@@ -61,9 +61,10 @@ if [ ${#UPDATED_FILES[@]} -ne 0 ]; then
   
   git push origin $BRANCH_NAME
   
-  GITHUB_TOKEN=${GITHUB_TOKEN} gh pr create --title "Update requirements for Python versions on $DATE" \
-               --body "This PR updates the following requirements files based on the output of failed tests:\n- ${UPDATED_FILES[*]}\nDate of update: $DATE" \
-               --label "update, automated-pr"
+  echo "::set-output name=updated::true"
+  echo "::set-output name=updated_files::${UPDATED_FILES[*]}"
+  echo "::set-output name=update_date::$DATE"
 else
   echo "No requirements updated."
+  echo "::set-output name=updated::false"
 fi
