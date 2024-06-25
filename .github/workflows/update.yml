@@ -39,19 +39,22 @@ jobs:
           BRANCH_NAME="update-requirements-${GITHUB_RUN_ID}"
           git checkout -b $BRANCH_NAME
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          echo "DATE=${{ steps.run_pru.outputs.update_date }}" >> $GITHUB_ENV
 
       - name: Commit changes
         if: steps.run_pru.outputs.updated == 'true'
         run: |
-          git add ${UPDATED_FILES}
-          git commit -m "Update requirements based on failed tests
-          - Updated files: ${UPDATED_FILES}
-          - Date: ${DATE}"
+          git add .
+          git commit -m "Update requirements based on failed tests at $DATE"
+        env:
+          DATE: ${{ steps.run_pru.outputs.update_date }}
 
       - name: Push changes
         if: steps.run_pru.outputs.updated == 'true'
         run: |
           git push origin $BRANCH_NAME
+        env:
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
 
       - name: Create Pull Request
         if: steps.run_pru.outputs.updated == 'true'
