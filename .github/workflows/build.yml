@@ -50,13 +50,13 @@ jobs:
           pip install -e ."[dev]"
           pru
 
-      - name: Test package
+      - name: Run tests
         id: pytest
         run: |
           python3 -m pytest . -c pyproject.toml --cov-report term-missing --cov=src/pru
         continue-on-error: true
 
-      - name: Test package 2
+      - name: Run tests with last failed
         id: pytest2
         if: steps.pytest.outcome != 'success'
         run: |
