@@ -2,7 +2,7 @@
 
 set -e
 
-PYTHON_VERSIONS=("3.7" "3.8" "3.9" "3.10" "3.11" "3.12")
+PYTHON_VERSIONS=("3.9" "3.10" "3.11" "3.12")
 UPDATED_FILES=()
 DATE=$(date -u +'%Y-%m-%d')
 
