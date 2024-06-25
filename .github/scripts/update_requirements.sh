@@ -56,13 +56,13 @@ if [ ${#UPDATED_FILES[@]} -ne 0 ]; then
   
   git add "${UPDATED_FILES[@]}"
   git commit -m "Update requirements based on failed tests
-- Updated files: ${UPDATED_FILES[*]}
+- Updated files: ${UPDATED_FILES[@]}
 - Date: $DATE"
   
   git push origin $BRANCH_NAME
   
-  gh pr create --title "Update requirements for Python versions on $DATE" \
-               --body "This PR updates the following requirements files based on the output of failed tests:\n- ${UPDATED_FILES[*]}\nDate of update: $DATE" \
+  GITHUB_TOKEN=${GITHUB_TOKEN} gh pr create --title "Update requirements for Python versions on $DATE" \
+               --body "This PR updates the following requirements files based on the output of failed tests:\n- ${UPDATED_FILES[@]}\nDate of update: $DATE" \
                --label "update, automated-pr"
 else
   echo "No requirements updated."
