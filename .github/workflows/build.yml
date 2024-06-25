@@ -88,11 +88,14 @@ jobs:
           echo "::set-output name=updated::$(if [ "$updated_files" ]; then echo true; else echo false; fi)"
           echo "::set-output name=updated_files::$updated_files"
           echo "::set-output name=update_date::$(date -u +'%Y-%m-%d')"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Pull Request if requirements updated
         if: steps.run_pru.outputs.updated == 'true'
         uses: peter-evans/create-pull-request@v4
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: |
             Update requirements based on failed tests
             - Updated files: ${{ steps.run_pru.outputs.updated_files }}
