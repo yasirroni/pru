@@ -20,23 +20,23 @@ for version in "${PYTHON_VERSIONS[@]}"; do
   pip install pru
   
   # Calculate checksums before running pru
-  checksum_before_single=$(md5sum pytests/requirements/${version}/requirements_single.txt | cut -d ' ' -f 1)
-  checksum_before_mix=$(md5sum pytests/requirements/${version}/requirements_mix.txt | cut -d ' ' -f 1)
+  checksum_before_single=$(md5sum pytests/requirements/${version}/requirements_single_updated.txt | cut -d ' ' -f 1)
+  checksum_before_mix=$(md5sum pytests/requirements/${version}/requirements_mix_updated.txt | cut -d ' ' -f 1)
   
   # Run pru to update requirements
-  pru -r pytests/requirements/${version}/requirements_single.txt
-  pru -r pytests/requirements/${version}/requirements_mix.txt
+  pru -r pytests/requirements/${version}/requirements_single_updated.txt
+  pru -r pytests/requirements/${version}/requirements_mix_updated.txt
   
   # Calculate checksums after running pru
-  checksum_after_single=$(md5sum pytests/requirements/${version}/requirements_single.txt | cut -d ' ' -f 1)
-  checksum_after_mix=$(md5sum pytests/requirements/${version}/requirements_mix.txt | cut -d ' ' -f 1)
+  checksum_after_single=$(md5sum pytests/requirements/${version}/requirements_single_updated.txt | cut -d ' ' -f 1)
+  checksum_after_mix=$(md5sum pytests/requirements/${version}/requirements_mix_updated.txt | cut -d ' ' -f 1)
   
   # Check if any requirements file was updated
   if [ "$checksum_before_single" != "$checksum_after_single" ]; then
-    UPDATED_FILES+=("pytests/requirements/${version}/requirements_single.txt")
+    UPDATED_FILES+=("pytests/requirements/${version}/requirements_single_updated.txt")
   fi
   if [ "$checksum_before_mix" != "$checksum_after_mix" ]; then
-    UPDATED_FILES+=("pytests/requirements/${version}/requirements_mix.txt")
+    UPDATED_FILES+=("pytests/requirements/${version}/requirements_mix_updated.txt")
   fi
   
   # Deactivate and remove the virtual environment
