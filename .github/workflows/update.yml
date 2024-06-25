@@ -20,6 +20,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install pru
 
+      - name: Determine current branch
+        id: current_branch
+        run: echo "CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
+
       - name: Run requirements updater script
         id: run_pru
         run: |
@@ -65,7 +69,7 @@ jobs:
             Update requirements based on failed tests
             - Updated files: ${{ steps.run_pru.outputs.updated_files }}
             - Date: ${{ steps.run_pru.outputs.update_date }}
-          branch: main
+          branch: ${{ env.CURRENT_BRANCH }}  # Use the current branch as the base branch
           title: 'Update requirements on ${{ steps.run_pru.outputs.update_date }}'
           body: |
             This PR updates the following requirements files based on the output of failed tests:
