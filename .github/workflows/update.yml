@@ -37,6 +37,14 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
+      - name: Create new branch
+        if: steps.run_pru.outputs.updated == 'true'
+        run: |
+          BRANCH_NAME="update-requirements-${GITHUB_RUN_ID}"
+          git checkout -b $BRANCH_NAME
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          echo "DATE=${{ steps.run_pru.outputs.update_date }}" >> $GITHUB_ENV
+
       - name: Commit changes
         if: steps.run_pru.outputs.updated == 'true'
         run: |
@@ -45,19 +53,9 @@ jobs:
         env:
           DATE: ${{ steps.run_pru.outputs.update_date }}
 
-      - name: Create Pull Request
+      - name: Push changes
         if: steps.run_pru.outputs.updated == 'true'
-        uses: peter-evans/create-pull-request@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: |
-            Update requirements based on failed tests
-            - Updated files: ${{ steps.run_pru.outputs.updated_files }}
-            - Date: ${{ steps.run_pru.outputs.update_date }}
-          branch: update-requirements-${{ github.run_id }}
-          title: 'Update requirements on ${{ steps.run_pru.outputs.update_date }}'
-          body: |
-            This PR updates the following requirements files based on the output of failed tests:
-            - ${{ steps.run_pru.outputs.updated_files }}
-            Date of update: ${{ steps.run_pru.outputs.update_date }}
-          labels: update, automated-pr
+        run: |
+          git push origin $BRANCH_NAME
+        env:
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
