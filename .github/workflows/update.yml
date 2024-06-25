@@ -65,7 +65,7 @@ jobs:
             Update requirements based on failed tests
             - Updated files: ${{ steps.run_pru.outputs.updated_files }}
             - Date: ${{ steps.run_pru.outputs.update_date }}
-          branch: ${{ env.BRANCH_NAME }}
+          branch: main
           title: 'Update requirements on ${{ steps.run_pru.outputs.update_date }}'
           body: |
             This PR updates the following requirements files based on the output of failed tests:
