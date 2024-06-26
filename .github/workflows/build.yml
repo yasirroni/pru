@@ -78,3 +78,32 @@ jobs:
       - name: Fail the job if tests fail
         if: steps.pytest.outcome != 'success' && steps.pytest2.outcome != 'success'
         run: exit 1
+
+  update:
+    needs: build
+    if: needs.build.result != 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run requirements updater script
+        id: run_pru
+        run: |
+          bash .github/scripts/update_requirements.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit and push changes
+        if: steps.run_pru.outputs.updated == 'true'
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add .
+          git commit -m "Update requirements based on failed tests at $(date)"
+          git push origin HEAD

@@ -31,13 +31,13 @@ jobs:
       - name: Install package
         run: pip install -e ."[dev]"
 
-      - name: Test package
+      - name: Run tests
         id: pytest
         run: |
           python3 -m pytest . -c pyproject.toml
         continue-on-error: true
 
-      - name: Test package 2
+      - name: Run tests with last failed
         id: pytest2
         if: steps.pytest.outcome != 'success'
         run: |

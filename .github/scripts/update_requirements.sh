@@ -45,8 +45,10 @@ for version in "${PYTHON_VERSIONS[@]}"; do
   # Install pru into the virtual environment
   pip install pru
   
-  # Calculate checksums before running pru
+  # Get minor version
   minor_version=$(python${version} -c "import sys; print(f'{sys.version_info.minor}')")
+
+  # Calculate checksums before running pru
   checksum_before_single=$(md5sum "pytests/requirements/3_${minor_version}/requirements_single_updated.txt" | cut -d ' ' -f 1)
   checksum_before_mix=$(md5sum "pytests/requirements/3_${minor_version}/requirements_mix_updated.txt" | cut -d ' ' -f 1)
   
