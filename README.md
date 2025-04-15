@@ -2,6 +2,26 @@
 
 Not a [`pur`](https://github.com/alanhamlett/pip-update-requirements), but [`pru`](https://github.com/yasirroni/pru). Update and resolve `requirements.txt` based on the Python environment and pip used. Unlike [`Poetry`](https://python-poetry.org/docs/) and other dependencies management packages, you can use `pru` outside your project and exclude it from your project dependency. Just run `pru` whenever you feel like installing the latest package and update `requirements.txt` accordingly.
 
+For example, in `requirements.txt` from this:
+
+```txt
+requests>=2.32.1
+numpy<=1.26.3
+pandas==2.2.1
+scipy
+```
+
+to this:
+
+```
+requests==2.32.3
+numpy==2.0.0
+pandas==2.2.2
+scipy==1.14.0
+```
+
+It needs to be noted that the main usage of `pru` is to update packages and pin version to `requirements.txt`. The idea is because unlike `pyproject.toml`, `requirements.txt` should pin the version of pacakges used in current environment to ensure reproducibility in the future. This is best suited for repository containing experimentations and examples, not package development.
+
 ## Installation
 
 ```shell
