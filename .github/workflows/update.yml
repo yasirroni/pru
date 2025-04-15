@@ -1,0 +1,62 @@
+name: update
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  update:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pru
+
+      - name: Determine current branch
+        id: current_branch
+        run: echo "CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
+
+      - name: Run requirements updater script
+        id: run_pru
+        run: |
+          bash .github/scripts/update_requirements.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        if: steps.run_pru.outputs.updated == 'true'
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Create new branch
+        if: steps.run_pru.outputs.updated == 'true'
+        run: |
+          BRANCH_NAME="update-requirements-${GITHUB_RUN_ID}"
+          git checkout -b $BRANCH_NAME
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          echo "DATE=${{ steps.run_pru.outputs.update_date }}" >> $GITHUB_ENV
+
+      - name: Commit changes
+        if: steps.run_pru.outputs.updated == 'true'
+        run: |
+          git add .
+          git commit -m "Update requirements based on failed tests at $DATE"
+        env:
+          DATE: ${{ steps.run_pru.outputs.update_date }}
+
+      - name: Push changes
+        if: steps.run_pru.outputs.updated == 'true'
+        run: |
+          git push origin $BRANCH_NAME
+        env:
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
