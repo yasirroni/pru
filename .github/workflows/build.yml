@@ -30,7 +30,7 @@ jobs:
       matrix:
         python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Clone this repository
@@ -108,3 +108,6 @@ jobs:
           git add .
           git commit -m "Update requirements based on failed tests at $(date)"
           git push origin HEAD
+
+      - name: Fail the job if update
+        run: exit 1
