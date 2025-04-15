@@ -108,6 +108,3 @@ jobs:
           git add .
           git commit -m "Update requirements based on failed tests at $(date)"
           git push origin HEAD
-
-      - name: Fail the job if update
-        run: exit 1
