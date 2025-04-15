@@ -1,4 +1,6 @@
 requests>=2.32.1
 numpy<=1.26.3
 pandas==2.2.1
+pre-commit==99.99.99
+webio_jupyter_extension
 scipy
