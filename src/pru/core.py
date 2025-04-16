@@ -79,7 +79,15 @@ def get_installed_requirements_packages_and_version(requirements_path=None):
 def replace_requirements_packages_versions(requirements_path=None, output_path=None):
     requirements = read_requirements(requirements_path)
 
-    installed_packages_name = get_installed_packages_name()
+    installed_packages = get_installed_packages_name_and_version()
+
+    name_mapping = {}
+    for pkg_name in installed_packages:
+        # create normalized key from what is installed
+        normalized = pkg_name.lower().replace("-", "_")
+
+        # store original name
+        name_mapping[normalized] = pkg_name
 
     updated_requirements = []
     for requirement in requirements:
@@ -88,11 +96,17 @@ def replace_requirements_packages_versions(requirements_path=None, output_path=N
         #   support single package in multi package requirements
         match = re.search(r"^([\w.-]+)([>=<]+)?([\w.-]+)?(.*)$", requirement, re.DOTALL)
         if match:
-            package_name = match.group(1)
-            if package_name in installed_packages_name:
+            req_pkg_name = match.group(1)
+
+            # normalized what is in requirements.txt
+            normalized_req = req_pkg_name.lower().replace("-", "_")
+
+            if normalized_req in name_mapping:
+                installed_pkg_name = name_mapping[normalized_req]
                 # package installed and updated
                 updated_requirements.append(
-                    f"{package_name}=={get_package_version(package_name)}{match.group(4)}"
+                    f"{req_pkg_name}=="
+                    f"{installed_packages[installed_pkg_name]}{match.group(4)}"
                 )
             else:
                 updated_requirements.append(requirement)

@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
 
     runs-on: ubuntu-22.04
 
@@ -92,6 +92,9 @@ jobs:
 
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
 
       - name: Run requirements updater script
         id: run_pru
@@ -105,9 +108,7 @@ jobs:
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
+          git checkout ${{ github.head_ref }}
           git add .
           git commit -m "Update requirements based on failed tests at $(date)"
-          git push origin HEAD
-
-      - name: Fail the job if update
-        run: exit 1
+          git push origin HEAD:${{ github.head_ref }}
