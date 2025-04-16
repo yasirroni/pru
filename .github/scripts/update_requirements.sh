@@ -24,42 +24,42 @@ install_python() {
 
 for version in "${PYTHON_VERSIONS[@]}"; do
   echo "Processing Python $version"
-  
+
   # Install Python if not already installed
   install_python "$version"
-  
+
   # Create virtual environment specific to the current Python version
   python${version} -m venv "env_${version}"
   source "env_${version}/bin/activate"
-  
+
   # Install pip using get-pip.py if it's not already installed
   if ! command -v pip &> /dev/null; then
     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
     python get-pip.py
     rm get-pip.py
   fi
-  
+
   # Ensure pip is up-to-date within the virtual environment
   pip install --upgrade pip
-  
+
   # Install pru into the virtual environment
-  pip install pru
-  
+  pip install ."[dev]"
+
   # Get minor version
   minor_version=$(python${version} -c "import sys; print(f'{sys.version_info.minor}')")
 
   # Calculate checksums before running pru
   checksum_before_single=$(md5sum "pytests/requirements/3_${minor_version}/requirements_single_updated.txt" | cut -d ' ' -f 1)
   checksum_before_mix=$(md5sum "pytests/requirements/3_${minor_version}/requirements_mix_updated.txt" | cut -d ' ' -f 1)
-  
+
   # Run pru to update requirements within the virtual environment
   pru -r "pytests/requirements/3_${minor_version}/requirements_single_updated.txt"
   pru -r "pytests/requirements/3_${minor_version}/requirements_mix_updated.txt"
-  
+
   # Calculate checksums after running pru
   checksum_after_single=$(md5sum "pytests/requirements/3_${minor_version}/requirements_single_updated.txt" | cut -d ' ' -f 1)
   checksum_after_mix=$(md5sum "pytests/requirements/3_${minor_version}/requirements_mix_updated.txt" | cut -d ' ' -f 1)
-  
+
   # Check if any requirements file was updated
   if [ "$checksum_before_single" != "$checksum_after_single" ]; then
     UPDATED_FILES+=("pytests/requirements/3_${minor_version}/requirements_single_updated.txt")
@@ -67,7 +67,7 @@ for version in "${PYTHON_VERSIONS[@]}"; do
   if [ "$checksum_before_mix" != "$checksum_after_mix" ]; then
     UPDATED_FILES+=("pytests/requirements/3_${minor_version}/requirements_mix_updated.txt")
   fi
-  
+
   # Deactivate the virtual environment
   deactivate
   # Remove the virtual environment directory
