@@ -1,6 +1,6 @@
 requests==2.32.3
 numpy==2.0.2
 pandas==2.2.3
-pre-commit
-webio_jupyter_extension
+pre-commit==4.2.0
+webio_jupyter_extension==0.1.0
 scipy==1.13.1
