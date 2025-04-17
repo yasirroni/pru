@@ -13,7 +13,7 @@ scipy
 
 to this:
 
-```
+```txt
 requests==2.32.3
 numpy==2.0.0
 pandas==2.2.2
@@ -39,7 +39,7 @@ pru
 Explicit run using CLI:
 
 ```shell
-pru "requirements.txt" upgrade_requirements --cmd "pip install --upgrade"
+pru -r "requirements.txt" upgrade_requirements --cmd "pip install --upgrade" -o "requirements.txt"
 ```
 
 Using python:
