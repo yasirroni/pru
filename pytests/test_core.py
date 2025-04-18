@@ -50,7 +50,17 @@ def test_get_installed_packages_name_and_version():
     "file_name, expected",
     [
         ("requirements_single.txt", ["requests"]),
-        ("requirements_mix.txt", ["requests", "numpy", "pandas", "scipy"]),
+        (
+            "requirements_mix.txt",
+            [
+                "requests",
+                "numpy",
+                "pandas",
+                "pre-commit",
+                "webio_jupyter_extension",
+                "scipy",
+            ],
+        ),
     ],
 )
 def test_get_requirements_packages_name(requirements_dir, file_name, expected):
@@ -63,7 +73,17 @@ def test_get_requirements_packages_name(requirements_dir, file_name, expected):
     "file_name, expected",
     [
         ("requirements_single.txt", {"requests": None}),
-        ("requirements_mix.txt", {"requests": None, "numpy": None, "pandas": None}),
+        (
+            "requirements_mix.txt",
+            {
+                "requests": None,
+                "numpy": None,
+                "pandas": None,
+                "pre-commit": None,
+                "webio_jupyter_extension": None,
+                "scipy": None,
+            },
+        ),
     ],
 )
 def test_get_installed_requirements_packages_and_version(
