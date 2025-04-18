@@ -179,7 +179,7 @@ def get_installed_requirements_packages_and_version(requirements_path=None):
 
 def replace_requirements_packages_versions(requirements_path=None, output_path=None):
     """
-    Replace unpinned packages in a requirements file with installed versions.
+    Replace versions in a requirements file with installed versions.
 
     This function scans a requirements.txt-style file and replaces each
     package entry with its current version from the Python environment.
@@ -221,6 +221,7 @@ def replace_requirements_packages_versions(requirements_path=None, output_path=N
         # TODO:
         #   support respect all symbols
         #   support single package in multi package requirements
+        #   support verboste to print what is is updated
         match = re.search(r"^([\w.-]+)([>=<]+)?([\w.-]+)?(.*)$", requirement, re.DOTALL)
         if match:
             req_pkg_name = match.group(1)
