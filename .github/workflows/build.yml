@@ -83,7 +83,7 @@ jobs:
   update:
     needs: build
     if: always() && needs.build.result != 'success'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Set up Python
         uses: actions/setup-python@v4
