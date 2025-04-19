@@ -1,5 +1,8 @@
 # Python Requirements Updater
 
+[![PyPI version](https://badge.fury.io/py/pru.svg)](https://pypi.org/project/pru/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/yasirroni/pru/blob/main/LICENSE)
+
 Not [`pur`](https://github.com/alanhamlett/pip-update-requirements), but [`pru`](https://github.com/yasirroni/pru). It updates and resolves `requirements.txt` based on the current Python environment and `pip` version. Unlike [`Poetry`](https://python-poetry.org/docs/) and other dependency management tools, `pru` can be used outside your project and doesn't need to be included as a project dependency. Just run `pru` whenever you want to install the latest packages and update `requirements.txt` accordingly.
 
 For example, turn this `requirements.txt`:
