@@ -22,6 +22,7 @@ from pru.core import (
     replace_requirements_packages_versions,
     upgrade_requirements,
 )
+from pru.version import __version__
 
 
 def main():
@@ -94,9 +95,10 @@ def main():
         ),
     )
     parser.add_argument(
+        "-v",
         "--version",
         action="version",
-        version="pru 0.1.0",
+        version=f"pru {__version__}",
         help="Show the version and exit.",
     )
 
