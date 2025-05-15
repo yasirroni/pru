@@ -23,7 +23,8 @@ pandas==2.2.2
 scipy==1.14.0
 ```
 
-The primary purpose of `pru` is to update packages and pin their versions in `requirements.txt`. The motivation behind this is that, unlike `pyproject.toml`, `requirements.txt` should lock the versions of the packages currently used in the environment to ensure future reproducibility. This is best suited for repositories containing experiments and examples, not for package development.
+The primary purpose of `pru` is to update packages and pin their versions in `requirements.txt`. The motivation behind this is that, unlike `pyproject.toml`, `requirements.txt` should lock the versions of the packages currently used in the environment to ensure future reproducibility. This is best suited for repositories containing experiments and examples, not for package development. An article explaining `pru` also available at [Medium](https://medium.com/python-in-plain-english/simplifying-reproducibility-in-research-and-exploration-with-pru-e32fffbd7f01).
+
 
 ## Installation
 
