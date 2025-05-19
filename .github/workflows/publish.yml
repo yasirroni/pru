@@ -4,13 +4,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-test:
+  build:
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Clone this repository
@@ -24,17 +24,17 @@ jobs:
           cache-dependency-path: 'requirements.txt'
 
       - name: Upgrade pip and install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+        run: python -m pip install --upgrade pip
 
       - name: Install package
-        run: pip install -e ."[dev]"
+        run: |
+          pip install -e ."[dev]"
+          pru
 
       - name: Run tests
         id: pytest
         run: |
-          python3 -m pytest . -c pyproject.toml
+          python3 -m pytest . -c pyproject.toml --cov-report term-missing --cov=src/pru
         continue-on-error: true
 
       - name: Run tests with last failed
