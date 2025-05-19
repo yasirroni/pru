@@ -94,7 +94,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Run requirements updater script
         id: run_pru
@@ -108,7 +108,8 @@ jobs:
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          git checkout ${{ github.head_ref }}
+          TARGET_BRANCH="${{ github.head_ref || github.ref_name }}"
+          git checkout "$TARGET_BRANCH"
           git add .
           git commit -m "Update requirements based on failed tests at $(date)"
-          git push origin HEAD:${{ github.head_ref }}
+          git push origin HEAD:"$TARGET_BRANCH"
