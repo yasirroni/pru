@@ -28,7 +28,7 @@ The primary purpose of `pru` is to update packages and pin their versions in `re
 
 ## Installation
 
-```shell
+```sh
 pip install pru
 ```
 
@@ -45,13 +45,13 @@ pip install pru
 
 Using CLI:
 
-```shell
+```sh
 pru
 ```
 
 Explicit run using CLI:
 
-```shell
+```sh
 pru -r "requirements.txt" upgrade_requirements --cmd "pip install --upgrade" -o "requirements.txt"
 ```
 

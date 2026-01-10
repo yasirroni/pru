@@ -1,7 +1,7 @@
-pre-commit==4.2.0
-pytest==8.3.5
-pytest-cov==6.1.1
+pre-commit==4.5.1
+pytest==9.0.2
+pytest-cov==7.0.0
 pytest-dependency==0.6.0
-pytest-xdist==3.6.1
-ruff==0.11.5
-setuptools==78.1.0
+pytest-xdist==3.8.0
+ruff==0.14.11
+setuptools==80.9.0
