@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
 
     runs-on: ubuntu-22.04
 
@@ -49,18 +49,18 @@ jobs:
         run: exit 1
 
   deploy:
-    needs: build-and-test
-    if: needs.build-and-test.result == 'success'
+    needs: build
+    if: needs.build.result == 'success'
     runs-on: ubuntu-latest
 
     steps:
       - name: Clone this repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
+      - name: Set up Python 3.14
         uses: actions/setup-python@v4
         with:
-          python-version: 3.12
+          python-version: 3.14
           cache: 'pip'
           cache-dependency-path: 'requirements.txt'
 
