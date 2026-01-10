@@ -2,6 +2,8 @@ import os
 import sys
 
 import pytest
+from pytest_dependency import depends
+
 from pru.core import (
     get_installed_packages_name,
     get_installed_packages_name_and_version,
@@ -14,7 +16,6 @@ from pru.core import (
     upgrade_requirements,
     verbose_subprocess,
 )
-from pytest_dependency import depends
 
 
 # TODO: revert file back after success test
