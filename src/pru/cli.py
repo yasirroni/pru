@@ -10,8 +10,19 @@ Supported commands:
 - upgrade_requirements: Upgrade packages and write pinned versions to
   `requirements.txt`.
 
-Example:
-    $ pru -r requirements.txt upgrade_requirements --cmd "pip install --upgrade"
+The CLI automatically detects and uses `uv` when available for faster package
+installation and upgrades. If `uv` is not installed, it falls back to using
+standard `pip`.
+
+Examples:
+    # Upgrade requirements (auto-detects uv)
+    $ pru -r requirements.txt
+
+    # Explicit command
+    $ pru -r requirements.txt upgrade_requirements --cmd "uv pip install --upgrade"
+
+    # Replace versions without upgrading
+    $ pru -r requirements.txt replace_versions
 """
 
 import argparse
@@ -52,8 +63,11 @@ def main():
     - Uses `argparse` to configure CLI behavior.
     - The `--requirement` argument sets the path to the requirements file.
     - The `--output` argument sets the path to write the requirements file.
-    - The `--cmd` argument customizes the shell command for pip upgrading.
+    - The `--cmd` argument customizes the shell command for upgrading. If not
+      specified, automatically uses "uv pip install --upgrade" when uv is
+      available, otherwise falls back to "pip install --upgrade --user".
     - The default command is `upgrade_requirements`.
+    - Automatically detects and uses `uv` for faster package operations.
     """
 
     parser = argparse.ArgumentParser(
@@ -82,8 +96,12 @@ def main():
     parser.add_argument(
         "--cmd",
         type=str,
-        default="pip install --upgrade",
-        help="Command to use for upgrading packages on upgrade_requirements.",
+        default=None,
+        help=(
+            "Command to use for upgrading packages on upgrade_requirements. "
+            "If not specified, automatically uses 'uv pip install --upgrade' "
+            "when uv is available, otherwise 'pip install --upgrade --user'."
+        ),
     )
     parser.add_argument(
         "-o",

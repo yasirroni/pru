@@ -25,12 +25,54 @@ scipy==1.14.0
 
 The primary purpose of `pru` is to update packages and pin their versions in `requirements.txt`. The motivation behind this is that, unlike `pyproject.toml`, `requirements.txt` should lock the versions of the packages currently used in the environment to ensure future reproducibility. This is best suited for repositories containing experiments and examples, not for package development. An article explaining `pru` also available at [Medium](https://medium.com/python-in-plain-english/simplifying-reproducibility-in-research-and-exploration-with-pru-e32fffbd7f01).
 
+## Performance with uv
+
+`pru` automatically detects and uses [`uv`](https://github.com/astral-sh/uv) when available, making package installations significantly faster.
 
 ## Installation
+
+Standard installation:
 
 ```sh
 pip install pru
 ```
+
+For faster performance, install with `uv`:
+
+```sh
+pip install uv
+pip install pru
+```
+
+Or using `uv` directly:
+
+```sh
+uv pip install pru
+```
+
+### Quick Start with uv
+
+For developers working on a project, use `pru` to pin your `requirements.txt` as
+follows:
+
+```sh
+uv venv env3.14 --python 3.14
+source env3.14/bin/activate
+uv pip install pru
+pru -r requirements.txt
+```
+
+Then, you can guide your users as follows:
+
+```sh
+uv venv env3.14 --python 3.14
+source env3.14/bin/activate
+uv pip install -r requirements.txt
+```
+
+> [!NOTE]
+> On windows, a Python environment can be activated using
+> `source env3.14\Scripts\activate`.
 
 ## Usage
 
@@ -43,7 +85,7 @@ pip install pru
 
 `pru` can be used both as a Python package and from the CLI.
 
-Using CLI:
+Using CLI (automatically uses `uv` if available):
 
 ```sh
 pru
@@ -52,7 +94,7 @@ pru
 Explicit run using CLI:
 
 ```sh
-pru -r "requirements.txt" upgrade_requirements --cmd "pip install --upgrade" -o "requirements.txt"
+pru -r "requirements.txt" upgrade_requirements --cmd "uv pip install --upgrade" -o "requirements.txt"
 ```
 
 Using Python:
@@ -61,15 +103,17 @@ Using Python:
 from pru import upgrade_requirements
 
 file_path = 'requirements.txt'
-upgrade_requirements(file_path, command='pip install --upgrade')
+upgrade_requirements(file_path, command='uv pip install --upgrade')
 ```
 
-Very useful in workflows:
+Very useful in workflows (this will update `requirements.txt`, and you can commit the
+changes after this step):
 
 ```yaml
       - name: Upgrade pip and install dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install pru
           pru
 ```
 
