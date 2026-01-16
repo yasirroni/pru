@@ -47,7 +47,6 @@ pip cache purge
 
 ## Run all
 
-
 ```sh
 for version in 3.8 3.9 3.10 3.11 3.12 3.13 3.14; do
   uv venv env$version --python $version
@@ -59,6 +58,7 @@ done
 
 ```sh
 chmod +x scripts/update_requirements.sh
+./scripts/update_requirements.sh
 ```
 
 ```sh
