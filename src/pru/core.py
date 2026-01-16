@@ -1,6 +1,6 @@
 import re
 import sys
-from subprocess import PIPE, STDOUT, Popen
+from subprocess import DEVNULL, PIPE, STDOUT, Popen, run
 
 if sys.version_info >= (3, 8):
     IS_PYTHON_7 = False
@@ -8,6 +8,12 @@ if sys.version_info >= (3, 8):
 else:
     IS_PYTHON_7 = True
     import pkg_resources
+
+try:
+    run(["uv", "--version"], stdout=DEVNULL, stderr=DEVNULL, check=True)
+    IS_UV = True
+except (FileNotFoundError, Exception):
+    IS_UV = False
 
 
 def read_requirements(requirements_path=None):
@@ -255,7 +261,7 @@ def verbose_subprocess(command):
     """
     Run a subprocess command and print real-time output to the console.
 
-    Useful for observing pip upgrade/install output as it happens. Lines are
+    Useful for observing pip/uv upgrade/install output as it happens. Lines are
     printed to stdout as soon as they are received.
 
     Parameters
@@ -275,7 +281,7 @@ def verbose_subprocess(command):
             print(line.rstrip().decode("utf-8"))
 
 
-def upgrade_installed(requirements_path=None, command="pip install --upgrade --user"):
+def upgrade_installed(requirements_path=None, command=None):
     """
     Upgrade all installed packages listed in the requirements file.
 
@@ -286,30 +292,35 @@ def upgrade_installed(requirements_path=None, command="pip install --upgrade --u
     ----------
     requirements_path : str
         Path to the requirements file to read package names from.
-    command : str
-        Command used to upgrade each package, e.g.
+    command : str or None
+        Command used to upgrade each package. If None, automatically selects
+        "uv pip install --upgrade" if uv is available, otherwise falls back to
         "pip install --upgrade --user".
 
     Notes
     -----
     - Useful when you want to upgrade but not pin the versions.
     - Used internally by `upgrade_requirements`.
+    - Automatically uses uv if available for faster package installation.
     """
+
+    if command is None:
+        command = (
+            "uv pip install --upgrade" if IS_UV else "pip install --upgrade --user"
+        )
 
     verbose_subprocess(
         f"{command} {' '.join(get_requirements_packages_name(requirements_path))}"
     )
 
 
-def upgrade_requirements(
-    requirements_path=None, output_path=None, command="pip install --upgrade --user"
-):
+def upgrade_requirements(requirements_path=None, output_path=None, command=None):
     """
     Upgrade all packages listed in requirements.txt and pin their versions.
 
     This function performs two major tasks to help maintain a reproducible
     Python environment:
-    1. It upgrades all packages listed in a requirements file by calling pip
+    1. It upgrades all packages listed in a requirements file by calling pip/uv
        with the provided command.
     2. It rewrites the requirements file (or writes to an output path) by
        pinning the version of each package to the exact version installed
@@ -327,19 +338,21 @@ def upgrade_requirements(
     output_path : str or None, optional
         Path to the output file to write the updated, pinned requirements.
         If None, will overwrite the input file.
-    command : str, optional
-        Shell command used to perform the upgrade. Default is
+    command : str or None, optional
+        Shell command used to perform the upgrade. If None, automatically selects
+        "uv pip install --upgrade" if uv is available, otherwise falls back to
         "pip install --upgrade --user". The command is appended with
         package names before execution.
 
     Notes
     -----
-    - The function internally uses subprocess to call pip via
+    - The function internally uses subprocess to call pip/uv via
       `verbose_subprocess`.
     - The version pinning is done using `==` for each package, matching the
       version found in the current environment.
     - The function normalizes package names to resolve discrepancies like
       `some-pkg` vs `some_pkg`.
+    - Automatically uses uv if available for faster package installation.
 
     See Also
     --------
@@ -348,6 +361,11 @@ def upgrade_requirements(
     upgrade_installed : Upgrade packages without rewriting the requirements
         file.
     """
+
+    if command is None:
+        command = (
+            "uv pip install --upgrade" if IS_UV else "pip install --upgrade --user"
+        )
 
     package_names = get_requirements_packages_name(requirements_path)
     verbose_subprocess(f"{command} {' '.join(package_names)}")
